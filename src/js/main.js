@@ -32,9 +32,11 @@ const sketch = (p) => {
 			p.B_ROWS * p.B_MAPSCALE
 		);
 
+		// a few more constants
 		p.B_CENTER = p5.Vector.mult(dim.view, 0.5);
 		p.B_PANNING = p.createVector();
 		p.B_MAXDIFF = p5.Vector.sub(dim.map, dim.view);
+		
 		p.createCanvas(dim.view.x, dim.view.y);
 		p.background(40);
 		
