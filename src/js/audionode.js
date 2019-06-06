@@ -1,9 +1,9 @@
 // A collection of three nodes: a source node, a binaural FIR panner node,
 // and a gain node.
 
-import binauralFIR from 'binaural-fir';
+import BinauralFIR from 'binauralfir';
 
-function AudioNode(ctx, master, hrtf, source, azi, dist) {
+function AudioNode(ctx, hrtf, source, azi, dist) {
 	this.active = false;
 	this.fadeout = false;
 	this.bird = null;
@@ -25,9 +25,12 @@ function AudioNode(ctx, master, hrtf, source, azi, dist) {
 
 	this.SoundSource.connect(this.GainNode);
 	this.GainNode.connect(this.BinPan.input);
-	this.BinPan.connect(master);
 
 	// this.BinPan.setPosition(azi, 0, dist);
+}
+
+AudioNode.prototype.connect = function(out) {
+	this.BinPan.connect(out);
 }
 
 AudioNode.prototype.play = function(source) {

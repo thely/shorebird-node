@@ -1,3 +1,4 @@
+import { B_ROWS, B_MAPSCALE } from './settings.js';
 
 function IslandMap(p, dim, data) {
 	this.p = p;

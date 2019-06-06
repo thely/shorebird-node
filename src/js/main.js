@@ -7,6 +7,7 @@ import ShoreMap from './shoremap.js';
 import Population from './population.js';
 import cobb_data from './data/cobb-island-data.js';
 import { bird_data } from './data/bird-species-data.js';
+import { B_COLS, B_ROWS, B_MAPSCALE } from './settings.js';
 
 var audiom, map, popul;
 var dim = {};
@@ -14,28 +15,20 @@ var dim = {};
 const sketch = (p) => {
 	var soundStarted;
 
-	function setDefaults() {
-		p.B_COLS = parseInt(process.env.B_COLS);
-		p.B_ROWS = parseInt(process.env.B_ROWS);
-		p.B_MAPSCALE = parseInt(process.env.B_MAPSCALE);
-		p.B_POPSCALE = parseFloat(process.env.B_POPSCALE);
-		p.B_MAXNODES = parseInt(process.env.B_MAXNODES);
-		p.B_USEDTILES = [];
-	}
-
 	p.setup = () => {
-		setDefaults();
+		// setDefaults();
 
 		dim.view = p.createVector(700, 500);
 		dim.map = p.createVector(
-			p.B_COLS * p.B_MAPSCALE,
-			p.B_ROWS * p.B_MAPSCALE
+			B_COLS * B_MAPSCALE,
+			B_ROWS * B_MAPSCALE
 		);
 
 		// a few more constants
 		p.B_CENTER = p5.Vector.mult(dim.view, 0.5);
 		p.B_PANNING = p.createVector();
 		p.B_MAXDIFF = p5.Vector.sub(dim.map, dim.view);
+		p.B_USEDTILES = [];
 		
 		p.createCanvas(dim.view.x, dim.view.y);
 		p.background(40);

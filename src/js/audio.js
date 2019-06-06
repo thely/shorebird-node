@@ -2,7 +2,7 @@
 import { AudioContext } from 'standardized-audio-context';
 import { loadAudioBuffer } from 'audiobuffer-loader';
 import SampleManager from 'sample-manager';
-import hrtfs from './data/hrtf.js';
+// import hrtfs from './data/hrtf.js';
 import AudioNode from './audionode.js';
 
 function AudioManager(today, birdData, max) {
@@ -17,6 +17,7 @@ function AudioManager(today, birdData, max) {
 	this.masterGain.connect(this.ctx.destination);
 }
 
+// call when the date changes to refigure the files needed
 AudioManager.prototype.setDate = function(today, birdData) {
 	if (!this.sounds) {
 		this.sounds = [];
@@ -26,10 +27,12 @@ AudioManager.prototype.setDate = function(today, birdData) {
 	__loadFiles.call(this, newSounds);
 }
 
-AudioPlayer.prototype.makeNodes = function(birds) {
-	var hrtf = getHRTF(this.context);
-	var list = this.bufferLoader.bufferList;
-	this.files = list;
+// build the nodes out when the player is created
+// ************
+AudioManager.prototype.makeNodes = function(birds) {
+	var hrtf = __getHRTF(this.ctx);
+	// var list = this.bufferLoader.bufferList;
+	// this.files = list;
 
 	for (var i = 0; i < this.total; i++) {
 		var source = list[i]; // so the source node doesn't get angry
@@ -38,11 +41,12 @@ AudioPlayer.prototype.makeNodes = function(birds) {
 	console.log(this.inactiveNodes);
 }
 
+// update the nodes
 AudioManager.prototype.update = function(birds) {
 
 }
 
-AudioPlayer.prototype.master = function(val) {
+AudioManager.prototype.master = function(val) {
 	if (val != 0) { 
 		this.masterGain.gain.exponentialRampToValueAtTime(val, this.context.currentTime + 0.5);
 	}
@@ -60,16 +64,17 @@ function __loadFiles(samps) {
 		// var s = this.ctx.createBufferSource();
 		// s.buffer = this.mng.getAllSamples()[0].audioBuffer;
 		// s.connect(this.ctx.destination);
-		s.start();
+		// s.start();
 	});
 }
 
+// get just the names of new files to be added
 function __getSoundFilenames(today, birdData, prevSounds) {
 	var fList = [];
 	for (var i = 0; i < today.length; i++) {
 		if (today[i] > 0 && !prevSounds[i].contains(birdData[i].name)) {
-			var filename = B_FILEFOLDER + "audio/"+birdData[i].name+".ogg";
-			fList[i] = filename;
+			// var filename = B_FILEFOLDER + "audio/"+birdData[i].name+".ogg";
+			fList[i] = birdData[i].name;
 		}
 		else {
 			fList[i] = "";
@@ -78,8 +83,8 @@ function __getSoundFilenames(today, birdData, prevSounds) {
 	return fList;
 }
 
+// Recreate a buffer file for the HRTF out of the numeric data in hrtfs.js
 function __getHRTF(ctx) {
-	// Recreate a buffer file for the HRTF out of the numeric data in hrtfs.js
 	for (var i = 0; i < hrtfs.length; i++) {
 		var buffer = this.ctx.createBuffer(2, 512, 44100);
 		var buffLeft = buffer.getChannelData(0);

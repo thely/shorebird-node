@@ -1,4 +1,5 @@
 import p5 from 'p5';
+import { B_ROWS, B_MAPSCALE } from './settings.js';
 
 function Bird(p, info, habitats, color) {
 	this.p = p;
@@ -7,13 +8,13 @@ function Bird(p, info, habitats, color) {
 
 	// find the top-left start pos of this tile
 	var start = p.createVector(
-		parseInt(Math.floor(this.tile / p.B_ROWS) * p.B_MAPSCALE),
-		parseInt(((this.tile) % p.B_ROWS) * p.B_MAPSCALE)
+		parseInt(Math.floor(this.tile / B_ROWS) * B_MAPSCALE),
+		parseInt(((this.tile) % B_ROWS) * B_MAPSCALE)
 	);
 	// generate a bird position inside the tile
 	this.pos = p.createVector(
-		p.random(start.x, start.x + p.B_MAPSCALE),
-		p.random(start.y, start.y + p.B_MAPSCALE)
+		p.random(start.x, start.x + B_MAPSCALE),
+		p.random(start.y, start.y + B_MAPSCALE)
 	);
 	this.fixedPos = this.pos.copy();
 

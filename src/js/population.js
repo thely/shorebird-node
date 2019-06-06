@@ -3,6 +3,7 @@
 
 import p5 from 'p5';
 import Bird from './bird.js';
+import { B_POPSCALE } from './settings.js';
 
 function Population(p, dim, bird_data) {
 	this.p = p;
@@ -26,8 +27,6 @@ Population.prototype.makeBirds = function(today, habitats) {
 	var birds = [];
 	var center = this.center;
 	let p = this.p;
-	console.log(today);
-	console.log(habitats);
 
 	this.visibleBirds = [];
 	var totalBirds = 0;
@@ -44,7 +43,7 @@ Population.prototype.makeBirds = function(today, habitats) {
 			};
 
 			// // place # birds of species i
-			var pop = Math.ceil(today[i] * p.B_POPSCALE);
+			var pop = Math.ceil(today[i] * B_POPSCALE);
 			console.log("the pop: "+pop);
 			totalBirds += pop;
 
