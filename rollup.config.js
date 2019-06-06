@@ -17,6 +17,7 @@ export default {
 				'node_modules/standardized-audio-context/build/es5/bundle.js': ['AudioContext'],
 				'node_modules/sample-manager/index.js': ['SampleManager'],
 				'node_modules/p5/lib/p5.min.js': ['p5'],
+				'node_modules/binauralfir/binaural-fir.min.js': ['BinauralFIR'],
 			},
 		}),
 		scss({
