@@ -20,10 +20,10 @@ IslandMap.prototype.drawHabitats = function(panning) {
 
 		// top-left of the tile & size of that tile
 		var start = p.createVector(
-			(Math.floor(i / p.B_ROWS) * p.B_MAPSCALE) + panning.x,
-			((i % p.B_ROWS) * p.B_MAPSCALE) + panning.y
+			(Math.floor(i / B_ROWS) * B_MAPSCALE) + panning.x,
+			((i % B_ROWS) * B_MAPSCALE) + panning.y
 		);
-		var size = p.createVector(p.B_MAPSCALE, p.B_MAPSCALE);
+		var size = p.createVector(B_MAPSCALE, B_MAPSCALE);
 
 		// draw that tile, if you can see it!
 		if (__isTileVisible(start, size, this.dim.view)) {

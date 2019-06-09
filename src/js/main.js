@@ -1,13 +1,12 @@
 
 // import '../sass/style.scss';
-import {} from 'dotenv';
 import p5 from 'p5';
 import AudioManager from './audio.js';
 import ShoreMap from './shoremap.js';
 import Population from './population.js';
 import cobb_data from './data/cobb-island-data.js';
 import { bird_data } from './data/bird-species-data.js';
-import { B_COLS, B_ROWS, B_MAPSCALE } from './settings.js';
+import { B_COLS, B_ROWS, B_MAPSCALE, B_MAXNODES } from './settings.js';
 
 var audiom, map, popul;
 var dim = {};
@@ -16,8 +15,6 @@ const sketch = (p) => {
 	var soundStarted;
 
 	p.setup = () => {
-		// setDefaults();
-
 		dim.view = p.createVector(700, 500);
 		dim.map = p.createVector(
 			B_COLS * B_MAPSCALE,
@@ -37,7 +34,8 @@ const sketch = (p) => {
 		popul.makeBirds(cobb_data["birds_and_days"][0]["count"], cobb_data["habitats_in_pixels"]);
 		
 		map = new ShoreMap(p, dim, cobb_data);
-		// am = new AudioManager();
+		audiom = new AudioManager(p, B_MAXNODES);
+		audiom.setup(cobb_data["birds_and_days"][0]["count"], bird_data);
 		soundStarted = false;
 
 		p.noLoop();
@@ -58,9 +56,9 @@ const sketch = (p) => {
 		p.B_PANNING.add(p.createVector(p.mouseX - p.pmouseX, p.mouseY - p.pmouseY));
 		p.B_PANNING.x = p.constrain(p.B_PANNING.x, -p.B_MAXDIFF.x, 0);
 		p.B_PANNING.y = p.constrain(p.B_PANNING.y, -p.B_MAXDIFF.y, 0);
-		console.log(p.B_PANNING);
 		
 		popul.update(p.B_PANNING);
+		audiom.update(popul.getVisibleBirds());
 
 		return false;
 	}

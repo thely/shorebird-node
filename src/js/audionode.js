@@ -3,7 +3,8 @@
 
 import BinauralFIR from 'binauralfir';
 
-function AudioNode(ctx, hrtf, source, azi, dist) {
+function AudioNode(p, ctx, hrtf, source) {
+	this.p = p;
 	this.active = false;
 	this.fadeout = false;
 	this.bird = null;
@@ -39,8 +40,8 @@ AudioNode.prototype.play = function(source) {
 	this.SoundSource.loop = true;
 
 	var dur = this.SoundSource.buffer.duration;
-	var fileOffset = random(0, dur);
-	var startOffset = random(0, 2);
+	var fileOffset = this.p.random(0, dur);
+	var startOffset = this.p.random(0, 2);
 	this.SoundSource.connect(this.GainNode);
 	this.SoundSource.start(startOffset, fileOffset);
 	// this.SoundSource.start(val);
@@ -74,12 +75,6 @@ AudioNode.prototype.file = function(file) {
 		this.SoundSource.buffer = file;
 	}
 	return this.SoundSource.buffer;
-}
-
-function __gainFromDistance(dist, max) {
-	// var x = Math.min(1 / (0.5 * Math.PI * Math.pow(dist, 2) + 1), max);
-	var x = Math.min(1 / (0.5 * dist), max);
-	return x;
 }
 
 export default AudioNode;
