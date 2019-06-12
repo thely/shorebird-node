@@ -3,6 +3,7 @@
 
 import p5 from 'p5';
 import IslandMap from './island-map.js';
+import { B_DEBUG } from './settings.js';
 
 function ShoreMap(p, dim, data) {
 	// this.island = island;
@@ -15,31 +16,37 @@ function ShoreMap(p, dim, data) {
 }
 
 ShoreMap.prototype.drawFullMap = function(birds, panning) {
-	this.baseMap(panning);
-	this.drawBirds(birds);
-}
-
-ShoreMap.prototype.baseMap = function(panning) {
 	var p = this.p;
 	p.noStroke();
 	p.fill("#FFFFF0");
 	p.rect(0, 0, this.dim.view.x, this.dim.view.y);
 
 	this.island.drawHabitats(panning);
+	this.drawBirds(birds);
 	// this.getLargerMap(panning);
 
 	this.center = p5.Vector.div(this.dim.view, 2);
-	p.fill("#000000");
-	p.rect(this.center.x, this.center.y, 2, 2);
+	// p.rect(0,0,10,10);
+	
 }
+
+// ShoreMap.prototype.baseMap = function(panning) {
+
+// }
 
 ShoreMap.prototype.drawBirds = function(birds) {
 	for (var i = 0; i < birds.length; i++) {
-		if (birds[i].visible.now) {
-			this.p.fill(birds[i].color.r, birds[i].color.g, birds[i].color.b);
-			this.p.rect(birds[i].pos.x, birds[i].pos.y, 5, 5);
+		if (birds[i].isVisible()) {
+			this.p.strokeWeight(4);
+			this.p.stroke("#FF0000");
 		}
+		else {
+			this.p.noStroke();
+		}
+		birds[i].draw();
 	}
+	this.p.noStroke();
+	this.p.strokeWeight(1);
 }
 
 ShoreMap.prototype.getCenter = function() {
@@ -50,7 +57,8 @@ ShoreMap.prototype.getCenter = function() {
 }
 
 ShoreMap.prototype.getLargerMap = function(panning) {
-	fill("#d3f2d3");
+	var p = this.p;
+	p.fill("#d3f2d3");
 	var start;
 	if (panning) {
 		start = panning;
@@ -59,7 +67,7 @@ ShoreMap.prototype.getLargerMap = function(panning) {
 		start = { x: 0, y: 0 };
 	}
 	
-	rect(start.x, start.y, dim.map.x, dim.map.y);
+	p.rect(start.x, start.y, dim.map.x, dim.map.y);
 }
 
 export default ShoreMap;

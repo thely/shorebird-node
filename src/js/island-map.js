@@ -29,6 +29,7 @@ IslandMap.prototype.drawHabitats = function(panning) {
 		if (__isTileVisible(start, size, this.dim.view)) {
 			var color = this.colorList[hab];
 			__drawTile(p, color, start, size);
+			__drawTileBorders(p, i, start, size);
 		}
 	}
 }
@@ -43,11 +44,13 @@ function __drawTile(p, color, start, size) {
 	p.pop();
 }
 
-function __drawTileBorders(i) {
+function __drawTileBorders(p, i, start, size) {
 	// ----- tile border visualization when desired
-	if (B_USEDTILES.includes(i)) {
-		this.p.stroke("#FFFF00");
-		this.p.rect(start.x, start.y, size.x, size.y);
+	if (p.B_USEDTILES.includes(i)) {
+		p.push();
+		p.stroke("#FF0000");
+		p.rect(start.x, start.y, size.x, size.y);
+		p.pop();
 	}
 }
 

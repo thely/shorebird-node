@@ -10,8 +10,6 @@ function Population(p, dim, bird_data) {
 	this.dim = dim;
 	this.bird_data = bird_data;
 	this.visibleBirds = [];
-	// this.birds = this.makeBirds(today, habitats);
-	// this.center = p5.Vector.mult(this.dim.view, 0.5);
 }
 
 // only returns currently visible birds!!
@@ -36,11 +34,7 @@ Population.prototype.makeBirds = function(today, habitats) {
 	for (var i = 0; i < today.length; i++) {
 		if (today[i] > 0) {
 			// one color per species
-			var color = {
-				r: Math.random() * 255,
-				g: Math.random() * 255,
-				b: Math.random() * 255
-			};
+			var color = __randomColor();
 
 			// // place # birds of species i
 			var pop = Math.ceil(today[i] * B_POPSCALE);
@@ -51,10 +45,11 @@ Population.prototype.makeBirds = function(today, habitats) {
 				var b = new Bird(p, this.bird_data[i], habitats, color);
 				b.species = i;
 				b.id = bCount;
+				b.update(this.dim.view, p.B_PANNING);
 				
 				// add to the list of lived-in tiles for collision detection/etc
 				p.B_USEDTILES.push(b.tile);
-				if (b.visible.now) {
+				if (b.isVisible()) {
 					this.visibleBirds.push(b);
 				}
 				birds[bCount] = b;
@@ -63,6 +58,8 @@ Population.prototype.makeBirds = function(today, habitats) {
 		}
 	}
 	console.log(totalBirds);
+	console.log("Are any of them visible?");
+	console.log(this.visibleBirds);
 	this.birds = birds;
 	return birds;
 }
@@ -72,18 +69,23 @@ Population.prototype.update = function(panning) {
 	let p = this.p;
 
 	for (var i = 0; i < this.birds.length; i++) {
-		var bird = this.birds[i];
-		bird.pos = p5.Vector.add(bird.fixedPos, panning);
-		bird.checkIsVisible(this.dim.view);
-		if (bird.visible.now) {
-			this.visibleBirds.push(bird);
-			bird.audioPosition(p);
+		this.birds[i].update(this.dim.view, panning);
+		if (this.birds[i].isVisible()) {
+			this.visibleBirds.push(this.birds[i]);
 		}
-
-		this.birds[i] = bird;
 	}
 
+	// console.log(this.visibleBirds[0]);
+
 	return this.visibleBirds;
+}
+
+function __randomColor() {
+	return {
+				r: Math.random() * 255,
+				g: Math.random() * 255,
+				b: Math.random() * 255
+			};
 }
 
 export default Population;

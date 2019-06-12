@@ -46,7 +46,6 @@ AudioManager.prototype.setDate = function(today, birdData) {
 }
 
 // build the nodes out when the player is created
-// ************
 AudioManager.prototype.makeNodes = function() {
 	var hrtf = __getHRTF.call(this);
 
@@ -98,7 +97,7 @@ AudioManager.prototype.updateNodes = function(birds) {
 		// if we weren't visible last frame, we haven't been added yet
 		if (!birds[i].hasAudioNode && this.nodes.inactive.length > 0) {
 			// console.log("our next bird: ");
-			console.log(birds[i]);
+			// console.log(birds[i]);
 			let n = this.nodes.inactive.pop();
 			n.bird = birds[i];
 			birds[i].hasAudioNode = true;
@@ -114,7 +113,6 @@ AudioManager.prototype.updateNodes = function(birds) {
 
 AudioManager.prototype.moveVisibleNode = function(b, n) {
 	if (b.visible.now) {
-		console.log("yes exist");
 		n.pan(b.azi, b.dist);
 				
 		var x = __gainFromDistance(b.dist, 0.4);
@@ -161,7 +159,9 @@ function __loadFiles() {
 	this.mng.loadAllSamples().then(() => {
 		console.log("sounds loaded!");
 		this.sounds.loadedTotal = this.sounds.needToLoad; //TODO: alter this when you start changing date
-		this.makeNodes();
+		if (this.nodes.active.length == 0 && this.nodes.inactive.length == 0) {
+			this.makeNodes();
+		}
 		// console.log(this.mng);
 		// create all nodes from this point probably
 		// var s = this.ctx.createBufferSource();
@@ -182,7 +182,6 @@ function __getSoundFilenames(today, birdData) {
 
 	for (var i = 0; i < today.length; i++) {
 		if (today[i] > 0) {
-			console.log(today[i]);
 			this.sounds.needForScene[i] = birdData[i].name;
 			this.sounds.needToLoad[i] = birdData[i].name;
 

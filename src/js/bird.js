@@ -12,25 +12,25 @@ function Bird(p, info, habitats, color) {
 		parseInt(((this.tile) % B_ROWS) * B_MAPSCALE)
 	);
 	// generate a bird position inside the tile
-	this.pos = p.createVector(
-		p.random(start.x, start.x + B_MAPSCALE),
-		p.random(start.y, start.y + B_MAPSCALE)
+	this.fixedPos = p.createVector(
+		p.round(p.random(start.x, start.x + B_MAPSCALE)),
+		p.round(p.random(start.y, start.y + B_MAPSCALE))
 	);
-	this.fixedPos = this.pos.copy();
+
+	console.log(this.fixedPos);
+
+	// this.fixedPos = __compensatePosition(p, this.fixedPos);
+	this.pos = this.fixedPos.copy();
 
 	this.visible = {
 		then: false,
 		now: false
 	};
-	// this.checkIsVisible(dim.view);
 
 	this.hasAudioNode = false;
 
 	// get the azimuth/distance for binaural panning and gain
-	p.push();
-	p.translate(p.B_CENTER.x, p.B_CENTER.y);
 	this.audioPosition(p);
-	p.pop();
 
 	this.color = color;
 }
@@ -50,12 +50,45 @@ Bird.prototype.pickHabitat = function(prefs, habitats) {
 	return tile;
 }
 
-Bird.prototype.checkIsVisible = function(pos2) {
-	this.visible.then = this.visible.now;
-	this.visible.now = checkBounds(this.pos, pos2);
+Bird.prototype.update = function(bounds, pan) {
+	this.pos = p5.Vector.add(this.fixedPos, pan);
+	this.checkIsVisible(bounds, pan);
+	if (this.visible.now) {
+		this.audioPosition(this.p);
+	}
 }
 
-function checkBounds(pos1, pos2) {
+Bird.prototype.draw = function() {
+	this.p.fill(this.color.r, this.color.g, this.color.b);
+	this.p.rect(this.pos.x, this.pos.y, 5, 5);
+	
+	this.p.push();
+	this.p.translate(this.pos.x, this.pos.y);
+	this.p.textSize(12);
+	let str = this.id +"\n("+this.fixedPos.x+","+this.fixedPos.y+")\n("+this.pos.x+","+this.pos.y+")";
+	this.p.text(str, 10, 0);
+	this.p.pop();
+}
+
+function __compensatePosition(p, pos) {
+	return p5.Vector.sub(pos, p.B_CENTER);
+}
+
+// ------------------------------------------
+// Methods for checking map visibility
+Bird.prototype.isVisible = function() {
+	return this.visible.now;
+}
+
+Bird.prototype.checkIsVisible = function(pos2, pan) {
+	this.visible.then = this.visible.now;
+	this.visible.now = __checkBounds(this.p, this.pos, pos2, pan);
+}
+
+// 926 - 288 = 638
+// 898 - 273
+
+function __checkBounds(p, pos1, pos2, pan) {
 	if (pos1.x < 0 || pos1.y < 0) {
 		return false;
 	}
@@ -65,6 +98,8 @@ function checkBounds(pos1, pos2) {
 	return true;
 }
 
+// ------------------------------------------
+// Methods for generating angles for binaural audio
 Bird.prototype.audioPosition = function(p) {
 	p.push();
 	p.translate(p.B_CENTER.x, p.B_CENTER.y);
