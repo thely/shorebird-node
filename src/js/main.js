@@ -41,8 +41,8 @@ const sketch = (p) => {
 		popul.makeBirds(cobb_data["birds_and_days"][0]["count"], cobb_data["habitats_in_pixels"]);
 		
 		map = new ShoreMap(p, dim, cobb_data);
-		// audiom = new AudioManager(p, B_MAXNODES);
-		// audiom.setup(cobb_data["birds_and_days"][0]["count"], bird_data);
+		audiom = new AudioManager(p, B_MAXNODES);
+		audiom.setup(cobb_data["birds_and_days"][0]["count"], bird_data);
 		soundStarted = false;
 
 		p.frameRate(30);
@@ -53,7 +53,8 @@ const sketch = (p) => {
 		let pan = cam.getPanning();
 		pan = p.createVector(pan.x, pan.y);
 		popul.update(pan);
-		map.drawFullMap(popul.getBirds());
+		map.drawFullMap(popul.getVisibleBirds());
+		audiom.update(popul.getVisibleBirds(), popul.getBirds());
 	}
 
 	p.mousePressed = () => {
@@ -75,22 +76,13 @@ const sketch = (p) => {
 		p.noLoop();
 	}
 
-	// p.mouseWheel = (e) => {
-	//   var factor = Math.pow(1.01, e.delta);
-	//   cam.scale(factor, 0, 0);
-	//   p.redraw();
-
-	//   return false;
-	// }
-
-
 	p.keyPressed = () => {
 		if (p.key == 'a') {
-			p.B_ZOOM = cam.scale(1.1, 350, 250);
+			p.B_ZOOM = cam.scale(1.1, p.B_CENTER.x, p.B_CENTER.y);
 			p.redraw();
 		}
 		else if (p.key == 'z') {
-			p.B_ZOOM = cam.scale(0.9, 350, 250);
+			p.B_ZOOM = cam.scale(0.9, p.B_CENTER.x, p.B_CENTER.y);
 			p.redraw();
 		}
 		else if (p.key == 'r') {
