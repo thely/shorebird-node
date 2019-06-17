@@ -38,7 +38,7 @@ Population.prototype.makeBirds = function(today, habitats) {
 
 			// // place # birds of species i
 			var pop = Math.ceil(today[i] * B_POPSCALE);
-			console.log("the pop: "+pop);
+			// console.log("the pop: "+pop);
 			totalBirds += pop;
 
 			for (var j = 0; j < pop; j++) {
@@ -57,9 +57,7 @@ Population.prototype.makeBirds = function(today, habitats) {
 			}
 		}
 	}
-	console.log(totalBirds);
-	console.log("Are any of them visible?");
-	console.log(this.visibleBirds);
+	// console.log(totalBirds);
 	this.birds = birds;
 	return birds;
 }
@@ -69,15 +67,12 @@ Population.prototype.update = function(panning) {
 	let p = this.p;
 
 	for (var i = 0; i < this.birds.length; i++) {
-		// this.birds[i].update(this.dim.view, panning);
 		this.birds[i].update(p.B_CENTER, panning);
 		if (this.birds[i].isVisible()) {
 			this.visibleBirds.push(this.birds[i]);
 		}
 	}
-
-	// console.log(this.visibleBirds[0]);
-
+	
 	return this.visibleBirds;
 }
 

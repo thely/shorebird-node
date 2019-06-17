@@ -57,31 +57,37 @@ AudioManager.prototype.makeNodes = function() {
 }
 
 // update the nodes
-AudioManager.prototype.update = function(birds) {
-	this.updateNodes(birds);
-}
+// AudioManager.prototype.update = function(birds, allBirds) {
+// 	this.updateNodes(birds);
+// }
 
-AudioManager.prototype.updateNodes = function(birds) {
+AudioManager.prototype.update = function(birds, allBirds) {
 	this.p.shuffle(birds, true);
 
 	for (var i = this.nodes.active.length - 1; i >= 0; i--) {
 
 		// check if the bird we know is in the visible list
-		var b = __birdFromId(birds, this.nodes.active[i].bird.id);
+		var b = __birdFromId(birds, this.nodes.active[i].birdID);
 		if (b.length > 0) {
+			// this.nodes.active[i].pan(b[0].azi, b[0].dist);
+			// this.nodes.active[i].gain(__gainFromDistance(b[0].dist, 0.4));
 			this.moveVisibleNode(b[0], this.nodes.active[i]);
 		}
-		// our bird is gone
 		else {
-			if (this.nodes.active[i].fadeout && this.nodes.active[i].gain() == 0) {
+			// fully faded out
+			if (this.nodes.active[i].fadeout && this.nodes.active[i].gain() <= 0.01) {
 				this.nodes.active[i].stop();
-				this.nodes.active[i].bird.hasAudioNode = false; // this should be illegal!!!
-				this.nodes.active[i].bird = null;
+				let b1 = __birdFromId(allBirds, this.nodes.active[i].birdID);
+				b1[0].hasAudioNode = false; // this should be illegal!!!
+				this.nodes.active[i].birdID = null;
 				let n = this.nodes.active.splice(i, 1);
 				this.nodes.inactive.push(n[0]);
 			}
+			//currently fading out
 			else {
+				console.log("fadeout");
 				this.nodes.active[i].fadeout = true;
+				this.nodes.active[i].gain(0.00001);
 			}
 		}
 	}
@@ -96,26 +102,26 @@ AudioManager.prototype.updateNodes = function(birds) {
 	for (let i = 0; i < birds.length; i++) {
 		// if we weren't visible last frame, we haven't been added yet
 		if (!birds[i].hasAudioNode && this.nodes.inactive.length > 0) {
-			// console.log("our next bird: ");
-			// console.log(birds[i]);
 			let n = this.nodes.inactive.pop();
-			n.bird = birds[i];
+			n.birdID = birds[i].id;
 			birds[i].hasAudioNode = true;
 
-			// var file = this.files[birds[i].species];
 			let file = __getFile.call(this, birds[i].name);
-			this.moveVisibleNode(birds[i], n);
 			this.nodes.active.unshift(n);
+			this.moveVisibleNode(birds[i], this.nodes.active[0]);
 			this.nodes.active[0].play(file);
+			// this.nodes.active[0].gain(__gainFromDistance(birds[i].dist, 0.4));
 		}
 	}
 }
 
 AudioManager.prototype.moveVisibleNode = function(b, n) {
-	if (b.visible.now) {
+	// console.log("inside of visibleNode");
+	if (b.visible.now && b.visible.then) {
 		n.pan(b.azi, b.dist);
 				
 		var x = __gainFromDistance(b.dist, 0.4);
+		console.log("normal dist: "+ x);
 		n.gain(x);
 	}
 
@@ -139,6 +145,7 @@ AudioManager.prototype.moveVisibleNode = function(b, n) {
 		console.log("fadein");
 		// n.play();
 		var x = __gainFromDistance(b.dist, 0.4);
+		console.log("fade-in dist: "+x);
 		n.gain(x);
 	}
 }
@@ -221,6 +228,7 @@ function __birdFromId(arr, birdId) {
 function __gainFromDistance(dist, max) {
 	// var x = Math.min(1 / (0.5 * Math.PI * Math.pow(dist, 2) + 1), max);
 	var x = Math.min(1 / (0.5 * dist), max);
+	console.log("dist: "+dist+", x: "+x);
 	return x;
 }
 

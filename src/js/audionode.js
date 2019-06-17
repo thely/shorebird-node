@@ -7,7 +7,7 @@ function AudioNode(p, ctx, hrtf, source) {
 	this.p = p;
 	this.active = false;
 	this.fadeout = false;
-	this.bird = null;
+	this.birdID = null;
 	this.ctx = ctx;
 
 	this.SoundSource = ctx.createBufferSource(); 

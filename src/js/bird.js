@@ -17,8 +17,6 @@ function Bird(p, info, habitats, color) {
 		p.round(p.random(start.y, start.y + B_MAPSCALE))
 	);
 
-	console.log(this.fixedPos);
-
 	// this.fixedPos = __compensatePosition(p, this.fixedPos);
 	this.pos = this.fixedPos.copy();
 
@@ -107,16 +105,18 @@ Bird.prototype.audioPosition = function(p) {
 
 //p1 is the centerpoint in all cases
 function calcAngle(p,p2) {
-	var diff = p5.Vector.sub(p.B_CENTER, p2).rotate(p.HALF_PI);
-	var azi = p.degrees(diff.heading()).toFixed(2);
-	return -azi; 
+	// var diff = p5.Vector.sub(p.B_CENTER, p2).rotate(p.HALF_PI);
+	// var diff = 
+	var azi = p.degrees(p2.rotate(p.HALF_PI).heading());
+	return azi; 
 }
 
 function calcDistance(p,p2) {
-	var diff = p5.Vector.sub(p.B_CENTER, p2);
-	var c = diff.mag().toFixed(2);
+	// var diff = p5.Vector.sub(p.B_CENTER, p2);
+	var c = p2.mag() / 4;
+	// console.log(c);
 
-	return c / 300;
+	return c;
 }
 
 export default Bird;
