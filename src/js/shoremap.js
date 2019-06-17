@@ -1,4 +1,5 @@
 
+
 // Draws and updates the map.
 
 import p5 from 'p5';
@@ -37,13 +38,14 @@ ShoreMap.prototype.drawFullMap = function(birds, panning) {
 ShoreMap.prototype.drawBirds = function(birds) {
 	for (var i = 0; i < birds.length; i++) {
 		if (birds[i].isVisible()) {
-			this.p.strokeWeight(4);
-			this.p.stroke("#FF0000");
+			birds[i].draw();
+		// 	this.p.strokeWeight(4);
+		// 	this.p.stroke("#FF0000");
+		// }
+		// else {
+		// 	this.p.noStroke();
 		}
-		else {
-			this.p.noStroke();
-		}
-		birds[i].draw();
+		
 	}
 	this.p.noStroke();
 	this.p.strokeWeight(1);

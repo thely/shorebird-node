@@ -51,7 +51,7 @@ Bird.prototype.pickHabitat = function(prefs, habitats) {
 }
 
 Bird.prototype.update = function(bounds, pan) {
-	this.pos = p5.Vector.add(this.fixedPos, pan);
+	this.pos = p5.Vector.sub(this.fixedPos, pan);
 	this.checkIsVisible(bounds, pan);
 	if (this.visible.now) {
 		this.audioPosition(this.p);
@@ -60,10 +60,10 @@ Bird.prototype.update = function(bounds, pan) {
 
 Bird.prototype.draw = function() {
 	this.p.fill(this.color.r, this.color.g, this.color.b);
-	this.p.rect(this.pos.x, this.pos.y, 5, 5);
+	this.p.rect(this.fixedPos.x, this.fixedPos.y, 5, 5);
 	
 	this.p.push();
-	this.p.translate(this.pos.x, this.pos.y);
+	this.p.translate(this.fixedPos.x, this.fixedPos.y);
 	this.p.textSize(12);
 	let str = this.id +"\n("+this.fixedPos.x+","+this.fixedPos.y+")\n("+this.pos.x+","+this.pos.y+")";
 	this.p.text(str, 10, 0);
@@ -85,14 +85,11 @@ Bird.prototype.checkIsVisible = function(pos2, pan) {
 	this.visible.now = __checkBounds(this.p, this.pos, pos2, pan);
 }
 
-// 926 - 288 = 638
-// 898 - 273
-
 function __checkBounds(p, pos1, pos2, pan) {
-	if (pos1.x < 0 || pos1.y < 0) {
+	if (pos1.x < -pos2.x/p.B_ZOOM || pos1.y < -pos2.y/p.B_ZOOM) {
 		return false;
 	}
-	if (pos1.x >= pos2.x || pos1.y >= pos2.y) {
+	if (pos1.x >= pos2.x/p.B_ZOOM || pos1.y >= pos2.y/p.B_ZOOM) {
 		return false;
 	}
 	return true;

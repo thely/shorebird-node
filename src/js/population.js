@@ -69,7 +69,8 @@ Population.prototype.update = function(panning) {
 	let p = this.p;
 
 	for (var i = 0; i < this.birds.length; i++) {
-		this.birds[i].update(this.dim.view, panning);
+		// this.birds[i].update(this.dim.view, panning);
+		this.birds[i].update(p.B_CENTER, panning);
 		if (this.birds[i].isVisible()) {
 			this.visibleBirds.push(this.birds[i]);
 		}

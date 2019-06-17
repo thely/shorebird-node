@@ -1,7 +1,7 @@
 
 // import '../sass/style.scss';
 import p5 from 'p5';
-import { Camera } from './lib/p5.canvascam.js';
+import './lib/p5.canvascam.js';
 import AudioManager from './audio.js';
 import ShoreMap from './shoremap.js';
 import Population from './population.js';
@@ -26,23 +26,23 @@ const sketch = (p) => {
 		p.B_CENTER = p5.Vector.mult(dim.view, 0.5);
 		p.B_MAPCENTER = p5.Vector.mult(dim.map, 0.5);
 		p.B_OFFSET = p.createVector();
-		p.B_PANNING = p5.Vector.mult(p.B_CENTER, -1);
-		// p.B_PANNING = p.createVector();
-		p.B_MAXDIFF = p5.Vector.sub(dim.map, dim.view).add(p.B_CENTER).mult(0.5);
+		p.B_PANNING = p.createVector();
+		// p.B_MAXDIFF = p5.Vector.sub(dim.map, dim.view).add(p.B_CENTER).mult(0.5);
 		p.B_USEDTILES = [];
 		p.B_ZOOM = 1;
 		
 		p.createCanvas(dim.view.x, dim.view.y);
 		p.background(40);
 
-		cam = new p5.Camera();
+		cam = new p.CanvasCam(1, p.B_MAPCENTER.x, p.B_MAPCENTER.y);
+		p.B_LIMIT = cam.dimensions(dim.view, dim.map);
 		
 		popul = new Population(p, dim, bird_data);
 		popul.makeBirds(cobb_data["birds_and_days"][0]["count"], cobb_data["habitats_in_pixels"]);
 		
 		map = new ShoreMap(p, dim, cobb_data);
-		audiom = new AudioManager(p, B_MAXNODES);
-		audiom.setup(cobb_data["birds_and_days"][0]["count"], bird_data);
+		// audiom = new AudioManager(p, B_MAXNODES);
+		// audiom.setup(cobb_data["birds_and_days"][0]["count"], bird_data);
 		soundStarted = false;
 
 		p.frameRate(30);
@@ -50,23 +50,10 @@ const sketch = (p) => {
 	};
 
 	p.draw = () => {
-		// map.drawFullMap(popul.getVisibleBirds(), p.createVector(p.B_PANNING.x-p.B_CENTER.x, p.B_PANNING.y-p.B_CENTER.y));
-		p.push();
-		p.translate(p.width/2, p.height/2);
-		p.scale(p.B_ZOOM);
-		p.translate(p.B_PANNING.x/p.B_ZOOM, p.B_PANNING.y/p.B_ZOOM);
-
-
-		p.fill("#FF0000");
-		p.rect(0, 0, 10, 10);
-		
-		popul.update(p.B_PANNING);
-		map.drawFullMap(popul.getBirds(), p.B_PANNING);
-		audiom.update(popul.getVisibleBirds());
-
-		p.pop();
-
-		__frameRates(p.B_PANNING);
+		let pan = cam.getPanning();
+		pan = p.createVector(pan.x, pan.y);
+		popul.update(pan);
+		map.drawFullMap(popul.getBirds());
 	}
 
 	p.mousePressed = () => {
@@ -77,10 +64,9 @@ const sketch = (p) => {
 	}
 
 	p.mouseDragged = () => {
-		p.B_OFFSET = p.createVector(p.mouseX - p.pmouseX, p.mouseY - p.pmouseY);
-		p.B_PANNING.add(p.createVector(p.mouseX - p.pmouseX, p.mouseY - p.pmouseY));
-		p.B_PANNING.x = p.round(p.constrain(p.B_PANNING.x, -p.B_MAXDIFF.x, -p.B_CENTER.x/2));
-		p.B_PANNING.y = p.round(p.constrain(p.B_PANNING.y, -p.B_MAXDIFF.y, -p.B_CENTER.y/2));
+		let dx = cam.mouseX - cam.pmouseX;
+		let dy = cam.mouseY - cam.pmouseY;
+		cam.translate(-dx, -dy);
 
 		return false;
 	}
@@ -89,17 +75,31 @@ const sketch = (p) => {
 		p.noLoop();
 	}
 
+	// p.mouseWheel = (e) => {
+	//   var factor = Math.pow(1.01, e.delta);
+	//   cam.scale(factor, 0, 0);
+	//   p.redraw();
+
+	//   return false;
+	// }
+
+
 	p.keyPressed = () => {
 		if (p.key == 'a') {
-			p.B_ZOOM += 0.1;
+			p.B_ZOOM = cam.scale(1.1, 350, 250);
+			p.redraw();
 		}
 		else if (p.key == 'z') {
-			p.B_ZOOM -= 0.1;
+			p.B_ZOOM = cam.scale(0.9, 350, 250);
+			p.redraw();
+		}
+		else if (p.key == 'r') {
+			cam.reset();
+			p.redraw();
 		}
 
-		p.redraw();
+		return false;
 	}
-
 
 	function __frameRates(pan) {
 		p.push();
@@ -113,6 +113,7 @@ const sketch = (p) => {
 		maxdiff: (${p.B_MAXDIFF.x}, ${p.B_MAXDIFF.y})\n
 		viewsize: (${p.width}, ${p.height})
 		`;
+		text = `panning: (${pan.x}, ${pan.y})\n`;
 		p.textAlign(p.RIGHT);
 		p.text(text, p.width - d.x, p.height - d.y, d.x, d.y);
 		p.pop();

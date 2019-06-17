@@ -26,11 +26,11 @@ IslandMap.prototype.drawHabitats = function(panning) {
 		var size = p.createVector(B_MAPSCALE, B_MAPSCALE);
 
 		// draw that tile, if you can see it!
-		if (__isTileVisible(start, size, this.dim.view)) {
+		// if (__isTileVisible(start, size, this.dim.view)) {
 			var color = this.colorList[hab];
 			__drawTile(p, color, start, size);
 			__drawTileBorders(p, i, start, size);
-		}
+		// }
 	}
 }
 
