@@ -16,6 +16,14 @@ function ShoreMap(p, dim, data) {
 	this.island = new IslandMap(p, dim, data);
 }
 
+ShoreMap.prototype.clear = function() {
+	this.island = null;
+}
+
+ShoreMap.prototype.setIsland = function(data) {
+	this.island = new IslandMap(this.p, this.dim, data);
+}
+
 ShoreMap.prototype.drawFullMap = function(birds, panning) {
 	var p = this.p;
 	p.noStroke();
@@ -31,19 +39,10 @@ ShoreMap.prototype.drawFullMap = function(birds, panning) {
 	
 }
 
-// ShoreMap.prototype.baseMap = function(panning) {
-
-// }
-
 ShoreMap.prototype.drawBirds = function(birds) {
 	for (var i = 0; i < birds.length; i++) {
 		if (birds[i].isVisible()) {
 			birds[i].draw();
-		// 	this.p.strokeWeight(4);
-		// 	this.p.stroke("#FF0000");
-		// }
-		// else {
-		// 	this.p.noStroke();
 		}
 		
 	}
