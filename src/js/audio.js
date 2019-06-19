@@ -3,6 +3,7 @@ import { AudioContext } from 'standardized-audio-context';
 import { loadAudioBuffer } from 'audiobuffer-loader';
 import SampleManager from 'sample-manager';
 import AudioNode from './audionode.js';
+// import { bird_audio } from './data/audio-sprites.js';
 
 function AudioManager(p, max) {
 	this.p = p;
@@ -23,6 +24,9 @@ function AudioManager(p, max) {
 		soundsLoaded: false,
 		sceneChanged: false
 	};
+
+	this.hrtf = __getHRTF.call(this);
+	__loadFiles.call(this);
 }
 
 AudioManager.prototype.setup = function(today, birdData) {
@@ -31,35 +35,32 @@ AudioManager.prototype.setup = function(today, birdData) {
 
 // call when the date changes to refigure the files needed
 AudioManager.prototype.setDate = function(today, birdData) {
-	if (!this.sounds) {
-		this.sounds = {
-			loadedTotal: [], 	// the fnames we've loaded in total
-			needForScene: [], 	// the fnames we need to play right now
-			needToLoad: [] 		// the fnames we need to load
-		};
-	}
-	console.log(this.sounds);
+	// if (!this.sounds) {
+	// 	this.sounds = {
+	// 		loadedTotal: [], 	// the fnames we've loaded in total
+	// 		needForScene: [], 	// the fnames we need to play right now
+	// 		needToLoad: [] 		// the fnames we need to load
+	// 	};
+	// }
+	// console.log(this.sounds);
+	this.sounds = [];
 
-	__getSoundFilenames.call(this, today, birdData);
+	// __getSoundFilenames.call(this, today, birdData);
+	__getSoundLoopPoints.call(this, today, birdData);
 	console.log(this.sounds);
-	__loadFiles.call(this);
+	// __loadFiles.call(this);
 }
 
 // build the nodes out when the player is created
 AudioManager.prototype.makeNodes = function() {
-	var hrtf = __getHRTF.call(this);
+	this.nodes.active = [];
 
 	for (var i = 0; i < this.max; i++) {
 		var source = this.p.random(this.mng.getAllSamples()).audioBuffer;
-		this.nodes.inactive[i] = new AudioNode(this.p, this.ctx, hrtf, source);
+		this.nodes.inactive[i] = new AudioNode(this.p, this.ctx, this.hrtf, source);
 		this.nodes.inactive[i].connect(this.ctx.destination);
 	}
 }
-
-// update the nodes
-// AudioManager.prototype.update = function(birds, allBirds) {
-// 	this.updateNodes(birds);
-// }
 
 AudioManager.prototype.update = function(birds, allBirds) {
 	this.p.shuffle(birds, true);
@@ -106,7 +107,8 @@ AudioManager.prototype.update = function(birds, allBirds) {
 			n.birdID = birds[i].id;
 			birds[i].hasAudioNode = true;
 
-			let file = __getFile.call(this, birds[i].name);
+			// let file = __getFile.call(this, birds[i].name);
+			let file = this.sounds[birds[i].species];
 			this.nodes.active.unshift(n);
 			this.moveVisibleNode(birds[i], this.nodes.active[0]);
 			this.nodes.active[0].play(file);
@@ -121,7 +123,7 @@ AudioManager.prototype.moveVisibleNode = function(b, n) {
 		n.pan(b.azi, b.dist);
 				
 		var x = __gainFromDistance(b.dist, 0.4);
-		console.log("normal dist: "+ x);
+		// console.log("normal dist: "+ x);
 		n.gain(x);
 	}
 
@@ -161,11 +163,14 @@ AudioManager.prototype.master = function(val) {
 
 // Load files in as needed
 function __loadFiles() {
-	var samps = this.sounds.needToLoad.map(name => ({name}));	
+	// var samps = this.sounds.needToLoad.map(name => ({name}));
+	let samps = [{ name: "output" }];
 	this.mng.addSamples(samps);
-	this.mng.loadAllSamples().then(() => {
+	this.mng.loadAllSamples(progress => {
+		console.log("loading...");
+	}).then(() => {
 		console.log("sounds loaded!");
-		this.sounds.loadedTotal = this.sounds.needToLoad; //TODO: alter this when you start changing date
+		// this.sounds.loadedTotal = this.sounds.loadedTotal.concat(this.sounds.needToLoad); //TODO: alter this when you start changing date
 		if (this.nodes.active.length == 0 && this.nodes.inactive.length == 0) {
 			this.makeNodes();
 		}
@@ -189,12 +194,19 @@ function __getSoundFilenames(today, birdData) {
 
 	for (var i = 0; i < today.length; i++) {
 		if (today[i] > 0) {
-			this.sounds.needForScene[i] = birdData[i].name;
-			this.sounds.needToLoad[i] = birdData[i].name;
+			this.sounds.needForScene.push(birdData[i].name);
+			if (this.sounds.loadedTotal && !this.sounds.loadedTotal.includes(birdData[i].name)) {
+				this.sounds.needToLoad.push(birdData[i].name);	
+			}
+		}
+	}
+}
 
-			// if (!this.sounds.loadedTotal || !this.sounds.loadedTotal.contains(birdData[i].name)) {
-			// 	this.sounds.needToLoad[i] = birdData[i].name;
-			// }
+function __getSoundLoopPoints(today, birdData) {
+	let sounds = [];
+	for (let i = 0; i < today.length; i++) {
+		if (today[i] > 0) {
+			this.sounds[i] = birdData[i];
 		}
 	}
 }
@@ -228,7 +240,7 @@ function __birdFromId(arr, birdId) {
 function __gainFromDistance(dist, max) {
 	// var x = Math.min(1 / (0.5 * Math.PI * Math.pow(dist, 2) + 1), max);
 	var x = Math.min(1 / (0.5 * dist), max);
-	console.log("dist: "+dist+", x: "+x);
+	// console.log("dist: "+dist+", x: "+x);
 	return x;
 }
 

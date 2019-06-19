@@ -21,7 +21,7 @@ Population.prototype.getVisibleBirds = function() {
 	return this.visibleBirds;
 }
 
-Population.prototype.makeBirds = function(today, habitats) {
+Population.prototype.makeBirds = function(today, habitats, pan) {
 	var birds = [];
 	var center = this.center;
 	let p = this.p;
@@ -31,21 +31,21 @@ Population.prototype.makeBirds = function(today, habitats) {
 
 	// cycle through list of birds/day
 	var bCount = 0;
-	for (var i = 0; i < today.length; i++) {
+	for (let i = 0; i < today.length; i++) {
 		if (today[i] > 0) {
 			// one color per species
 			var color = __randomColor();
 
 			// // place # birds of species i
 			var pop = Math.ceil(today[i] * B_POPSCALE);
-			// console.log("the pop: "+pop);
+			// console.log("the pop: "+pop+", i: "+i);
 			totalBirds += pop;
 
 			for (var j = 0; j < pop; j++) {
 				var b = new Bird(p, this.bird_data[i], habitats, color);
 				b.species = i;
 				b.id = bCount;
-				b.update(this.dim.view, p.B_PANNING);
+				b.update(this.dim.view, pan);
 				
 				// add to the list of lived-in tiles for collision detection/etc
 				p.B_USEDTILES.push(b.tile);
@@ -57,7 +57,7 @@ Population.prototype.makeBirds = function(today, habitats) {
 			}
 		}
 	}
-	// console.log(totalBirds);
+	console.log("total birds: " + totalBirds);
 	this.birds = birds;
 	return birds;
 }
@@ -74,6 +74,11 @@ Population.prototype.update = function(panning) {
 	}
 	
 	return this.visibleBirds;
+}
+
+Population.prototype.clear = function() {
+	this.birds = [];
+	this.visibleBirds = [];
 }
 
 function __randomColor() {

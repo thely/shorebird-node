@@ -9,6 +9,7 @@ function AudioNode(p, ctx, hrtf, source) {
 	this.fadeout = false;
 	this.birdID = null;
 	this.ctx = ctx;
+	this.source = source;
 
 	this.SoundSource = ctx.createBufferSource(); 
 	this.SoundSource.buffer = source;
@@ -36,14 +37,17 @@ AudioNode.prototype.connect = function(out) {
 
 AudioNode.prototype.play = function(source) {
 	this.SoundSource = this.ctx.createBufferSource(); 
-	this.SoundSource.buffer = source;
+	this.SoundSource.buffer = this.source;
 	this.SoundSource.loop = true;
+	this.SoundSource.loopStart = source.start;
+	this.SoundSource.loopEnd = source.end;
 
-	var dur = this.SoundSource.buffer.duration;
-	var fileOffset = this.p.random(0, dur);
-	var startOffset = this.p.random(0, 2);
+	// var dur = this.SoundSource.buffer.duration;
+	var fileStartWhen = this.p.random(0, 2);
+	var fileStartPos = this.p.random(source.start, source.end);
 	this.SoundSource.connect(this.GainNode);
-	this.SoundSource.start(startOffset, fileOffset);
+	this.SoundSource.start(fileStartWhen, fileStartPos);
+	// console.log(this.SoundSource);
 	// this.SoundSource.start(val);
 	// i * 0.5 + Math.random()
 }

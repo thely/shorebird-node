@@ -4,6 +4,7 @@ import { B_ROWS, B_MAPSCALE } from './settings.js';
 function Bird(p, info, habitats, color) {
 	this.p = p;
 	this.name = info.name;
+	this.info = info;
 	this.pickHabitat(info.land_preference, habitats);
 
 	// find the top-left start pos of this tile
@@ -60,12 +61,26 @@ Bird.prototype.draw = function() {
 	this.p.fill(this.color.r, this.color.g, this.color.b);
 	this.p.rect(this.fixedPos.x, this.fixedPos.y, 5, 5);
 	
+	__nameText.call(this);
+}
+
+function __positionText() {
 	this.p.push();
 	this.p.translate(this.fixedPos.x, this.fixedPos.y);
 	this.p.textSize(12);
 	let str = this.id +"\n("+this.fixedPos.x+","+this.fixedPos.y+")\n("+this.pos.x+","+this.pos.y+")";
 	this.p.text(str, 10, 0);
 	this.p.pop();
+}
+
+function __nameText() {
+	this.p.push();
+	this.p.translate(this.fixedPos.x, this.fixedPos.y);
+	this.p.textSize(12);
+	// let str = this.id +"\n("+this.fixedPos.x+","+this.fixedPos.y+")\n("+this.pos.x+","+this.pos.y+")";
+	let str = `${this.info.common_name} (${this.info.name})`;
+	this.p.text(str, 10, 0);
+	this.p.pop();	
 }
 
 function __compensatePosition(p, pos) {
