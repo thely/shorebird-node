@@ -5,11 +5,14 @@ import SampleManager from 'sample-manager';
 import AudioNode from './audionode.js';
 // import { bird_audio } from './data/audio-sprites.js';
 
-function AudioManager(p, max) {
+function AudioManager(p, max, browser) {
 	this.p = p;
 
 	this.ctx = new AudioContext();
-	this.mng = new SampleManager(this.ctx, 'assets/audio/', 'ogg');
+
+	let type = (browser == "Firefox") ? "ogg" : "mp3";
+	console.log("our type is " + type);
+	this.mng = new SampleManager(this.ctx, 'assets/audio/', type);
 	this.max = max;
 
 	this.masterGain = this.ctx.createGain();

@@ -42,14 +42,10 @@ AudioNode.prototype.play = function(source) {
 	this.SoundSource.loopStart = source.start;
 	this.SoundSource.loopEnd = source.end;
 
-	// var dur = this.SoundSource.buffer.duration;
 	var fileStartWhen = this.p.random(0, 2);
 	var fileStartPos = this.p.random(source.start, source.end);
 	this.SoundSource.connect(this.GainNode);
 	this.SoundSource.start(fileStartWhen, fileStartPos);
-	// console.log(this.SoundSource);
-	// this.SoundSource.start(val);
-	// i * 0.5 + Math.random()
 }
 
 AudioNode.prototype.stop = function() {

@@ -7,8 +7,8 @@ import AudioManager from './audio.js';
 import ShoreMap from './shoremap.js';
 import Population from './population.js';
 import cobb_data from './data/cobb-island-data.js';
-// import { bird_data } from './data/bird-species-data.js';
 import all_bird_data from './data/all_bird_data.js';
+import Bowser from "bowser";
 import { B_COLS, B_ROWS, B_MAPSCALE, B_MAXNODES } from './settings.js';
 
 var audiom, map, popul, cam, useData, cnv;
@@ -29,6 +29,8 @@ const sketch = (p) => {
 	}
 
 	p.setup = () => {
+		const browser = Bowser.getParser(window.navigator.userAgent);
+		console.log(`Viewing this in ${browser.getBrowserName()}`);
 		dim.view = p.createVector(700, 500);
 		dim.map = p.createVector(
 			B_COLS * B_MAPSCALE,
@@ -51,7 +53,7 @@ const sketch = (p) => {
 		dateSel.changed(changeDate);
 
 		popul = new Population(p, dim, all_bird_data);
-		audiom = new AudioManager(p, B_MAXNODES);
+		audiom = new AudioManager(p, B_MAXNODES, browser.getBrowserName());
 
 		p.frameRate(30);
 		p.noLoop();
