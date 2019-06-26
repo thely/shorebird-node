@@ -20,6 +20,7 @@ p5.prototype.CanvasCam = function(zoom, tx, ty) {
 
   var limit = {};
   var dim = {};
+  var mapOrig = {};
 
   // self reference
   var cam = this;
@@ -83,12 +84,17 @@ p5.prototype.CanvasCam = function(zoom, tx, ty) {
 
   // rescale the camera relative to the center
   this.scale = function(factor, centerX, centerY) {
+    relimit();
     var newZoom = zoom * factor;
-    var dx = centerX - dim.x/2;
-    var dy = centerY - dim.y/2;
-    tx += dx/zoom - dx/newZoom;
-    ty += dy/zoom - dy/newZoom;
-    zoom = newZoom;
+
+    if (withinLimits(newZoom)) {
+      var dx = centerX - dim.x/2;
+      var dy = centerY - dim.y/2;
+      tx += dx/zoom - dx/newZoom;
+      ty += dy/zoom - dy/newZoom;
+      zoom = newZoom;
+      this.translate(0,0);
+    }
 
     return zoom;
   };
@@ -97,7 +103,7 @@ p5.prototype.CanvasCam = function(zoom, tx, ty) {
   this.translate = function(dx, dy) {
     tx = constrain(tx + dx, limit.x.min, limit.x.max);
     ty = constrain(ty + dy, limit.y.min, limit.y.max);
-    // console.log(`(${tx}, ${ty}) - zoom at ${zoom}`);
+    console.log(`(${tx}, ${ty}) - zoom at ${zoom}`);
   };
 
   this.getPanning = function() {
@@ -107,18 +113,35 @@ p5.prototype.CanvasCam = function(zoom, tx, ty) {
   this.dimensions = function(view, map) {
     dim.x = view.x;
     dim.y = view.y;
+    mapOrig.x = map.x;
+    mapOrig.y = map.y;
     limit.x = {
       min: view.x / 2,
-      max: map.x - (view.x / 2)
+      max: mapOrig.x - (view.x / 2)
     };
     limit.y = {
       min: view.y / 2,
-      max: map.y - (view.y / 2)
+      max: mapOrig.y - (view.y / 2)
     };
 
     return limit;
   }
 
+  function relimit() {
+    limit.x.min = dim.x / (2 * zoom);
+    limit.y.min = dim.y / (2 * zoom);
+    limit.x.max = mapOrig.x - limit.x.min;
+    limit.y.max = mapOrig.y - limit.y.min;
+  }
+
+  function withinLimits(newZoom) {
+    if (mapOrig.x * newZoom <= dim.x || mapOrig.y * newZoom <= dim.y) {
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
 
 };
 

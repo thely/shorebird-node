@@ -11,6 +11,8 @@ function ShoreMap(p, dim, data) {
 	// this.birds = birds;
 	this.p = p;
 	this.dim = dim;
+	console.log("inside the map: ");
+	console.log(this.dim);
 	this.center = { x: 0, y: 0 };
 
 	this.island = new IslandMap(p, dim, data);

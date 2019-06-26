@@ -7,11 +7,12 @@ import AudioManager from './audio.js';
 import ShoreMap from './shoremap.js';
 import Population from './population.js';
 import cobb_data from './data/cobb-island-data.js';
+import hog_data  from './data/hog-island-data.js';
 import all_bird_data from './data/all_bird_data.js';
 import Bowser from "bowser";
 import { B_COLS, B_ROWS, B_MAPSCALE, B_MAXNODES } from './settings.js';
 
-var audiom, map, popul, cam, useData, cnv;
+var audiom, map, popul, cam, useData, cnv, browser;
 var islandSel, dateSel;
 var dim = {};
 var soundStarted, mouseOverCanvas;
@@ -22,20 +23,24 @@ const sketch = (p) => {
 		// a few more globals
 		p.B_CENTER = p5.Vector.mult(dim.view, 0.5);
 		p.B_MAPCENTER = p5.Vector.mult(dim.map, 0.5);
-		p.B_OFFSET = p.createVector();
-		p.B_PANNING = p.createVector();
 		p.B_USEDTILES = [];
 		p.B_ZOOM = 1;
 	}
 
 	p.setup = () => {
-		const browser = Bowser.getParser(window.navigator.userAgent);
+		browser = Bowser.getParser(window.navigator.userAgent);
 		console.log(`Viewing this in ${browser.getBrowserName()}`);
 		dim.view = p.createVector(700, 500);
+		// dim.map = p.createVector(
+		// 	B_COLS * B_MAPSCALE,
+		// 	B_ROWS * B_MAPSCALE
+		// );
+		dim.tiles = p.createVector( B_COLS, B_ROWS );
 		dim.map = p.createVector(
-			B_COLS * B_MAPSCALE,
-			B_ROWS * B_MAPSCALE
+			dim.tiles.x * B_MAPSCALE,
+			dim.tiles.y * B_MAPSCALE
 		);
+
 
 		__defaults(dim);
 		
@@ -49,11 +54,13 @@ const sketch = (p) => {
 
 		islandSel = p.select(".island-select");
 		islandSel.changed(changeIsland);
-		dateSel = p.select(".date-select");
+		var parent = p.select(".data-menu");
+		dateSel = p.createSelect().addClass("date-select");
 		dateSel.changed(changeDate);
+		parent.child(dateSel);
 
 		popul = new Population(p, dim, all_bird_data);
-		audiom = new AudioManager(p, B_MAXNODES, browser.getBrowserName());
+		// audiom = new AudioManager(p, B_MAXNODES, browser.getBrowserName());
 
 		p.frameRate(30);
 		p.noLoop();
@@ -61,15 +68,34 @@ const sketch = (p) => {
 
 	function changeIsland() {
 		console.log(islandSel.value());
+
+		// get the right data set
 		if (islandSel.value() == "cobb_data") {
 			useData = cobb_data;
 		}
-		else if (islandSel.value() == "hog_data") { // TODO: change me when Hog exists
-			useData = cobb_data;
+		else if (islandSel.value() == "hog_data") {
+			useData = hog_data;
 		}
 
-		console.log(useData);
+		// reset map and camera stuff
+
+		// __defaults(dim);
+		// console.log(p.B_MAPCENTER);
+		// console.log(dim);
+
+		// cam.dimensions(dim.view, dim.map);
+		// cam.reset(p.B_ZOOM, p.B_MAPCENTER.x, p.B_MAPCENTER.y);
+
+		popul = new Population(p, dim, all_bird_data);
 		map = new ShoreMap(p, dim, useData);
+
+		// clear select list and begin anew
+		p.removeElements();
+
+		var parent = p.select(".data-menu");
+		dateSel = p.createSelect().addClass("date-select");
+		dateSel.changed(changeDate);
+		parent.child(dateSel);
 
 		for (let i = 0; i < useData["birds_and_days"].length; i++) {
 			dateSel.option(useData["birds_and_days"][i]["date"], i);
@@ -78,8 +104,6 @@ const sketch = (p) => {
 
 	function changeDate() {
 		let i = dateSel.value();
-		// console.log("new date: "+i);
-		// console.log(useData["birds_and_days"][i]["count"]);
 		
 		__defaults(dim);
 		popul.clear();
@@ -90,7 +114,7 @@ const sketch = (p) => {
 		popul.makeBirds(useData["birds_and_days"][i]["count"], useData["habitats_in_pixels"], cam.getPanning());
 		map.setIsland(useData);
 		console.log(popul.getBirds());
-		audiom.setup(useData["birds_and_days"][i]["count"], all_bird_data);
+		// audiom.setup(useData["birds_and_days"][i]["count"], all_bird_data);
 		// soundStarted = false;
 
 		p.redraw();
@@ -101,7 +125,7 @@ const sketch = (p) => {
 		pan = p.createVector(pan.x, pan.y);
 		popul.update(pan);
 		map.drawFullMap(popul.getVisibleBirds());
-		audiom.update(popul.getVisibleBirds(), popul.getBirds());
+		// audiom.update(popul.getVisibleBirds(), popul.getBirds());
 	}
 
 	p.mousePressed = () => {
