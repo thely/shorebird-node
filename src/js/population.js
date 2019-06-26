@@ -42,7 +42,7 @@ Population.prototype.makeBirds = function(today, habitats, pan) {
 			totalBirds += pop;
 
 			for (var j = 0; j < pop; j++) {
-				var b = new Bird(p, this.bird_data[i], habitats, color);
+				var b = new Bird(p, this.bird_data[i], this.dim, habitats, color);
 				b.species = i;
 				b.id = bCount;
 				b.update(this.dim.view, pan);

@@ -20,8 +20,8 @@ IslandMap.prototype.drawHabitats = function(panning) {
 
 		// top-left of the tile & size of that tile
 		var start = p.createVector(
-			(Math.floor(i / B_ROWS) * B_MAPSCALE) + panning.x,
-			((i % B_ROWS) * B_MAPSCALE) + panning.y
+			(Math.floor(i / this.dim.tiles.y) * B_MAPSCALE) + panning.x,
+			((i % this.dim.tiles.y) * B_MAPSCALE) + panning.y
 		);
 		var size = p.createVector(B_MAPSCALE, B_MAPSCALE);
 
