@@ -6,13 +6,14 @@ import './lib/p5.canvascam.js';
 import AudioManager from './audio.js';
 import ShoreMap from './shoremap.js';
 import Population from './population.js';
+import PopChart from './pop-chart.js';
 import cobb_data from './data/cobb-island-data.js';
 import hog_data  from './data/hog-island-data.js';
 import all_bird_data from './data/all_bird_data.js';
 import Bowser from "bowser";
-import { B_COLS, B_ROWS, B_MAPSCALE, B_MAXNODES } from './settings.js';
+import { B_WIDTH, B_HEIGHT, B_COLS, B_ROWS, B_MAPSCALE, B_MAXNODES, B_CANVAS_ID } from './settings.js';
 
-var audiom, map, popul, cam, useData, cnv, browser;
+var audiom, map, popul, cam, useData, cnv, chart, browser;
 var islandSel, dateSel;
 var dim = {};
 var soundStarted, mouseOverCanvas;
@@ -30,7 +31,7 @@ const sketch = (p) => {
 	p.setup = () => {
 		browser = Bowser.getParser(window.navigator.userAgent);
 		console.log(`Viewing this in ${browser.getBrowserName()}`);
-		dim.view = p.createVector(700, 500);
+		dim.view = p.createVector(B_WIDTH, B_HEIGHT);
 		// dim.map = p.createVector(
 		// 	B_COLS * B_MAPSCALE,
 		// 	B_ROWS * B_MAPSCALE
@@ -44,6 +45,7 @@ const sketch = (p) => {
 		__defaults(dim);
 		
 		cnv = p.createCanvas(dim.view.x, dim.view.y);
+		cnv.parent(B_CANVAS_ID);
 		cnv.mouseOver(function() { mouseOverCanvas = true; });
 		cnv.mouseOut(function() { mouseOverCanvas = false; });
 		p.background(40);
@@ -59,6 +61,7 @@ const sketch = (p) => {
 		parent.child(dateSel);
 
 		popul = new Population(p, dim, all_bird_data);
+		chart = new PopChart();
 		// audiom = new AudioManager(p, B_MAXNODES, browser.getBrowserName());
 
 		p.frameRate(30);
@@ -111,6 +114,7 @@ const sketch = (p) => {
 		cam.reset();
 
 		popul.makeBirds(useData["birds_and_days"][i]["count"], useData["habitats_in_pixels"], cam.getPanning());
+		chart.addData(all_bird_data, useData["birds_and_days"][i]["count"], popul.getColors());
 		map.setIsland(useData);
 		console.log(popul.getBirds());
 		// audiom.setup(useData["birds_and_days"][i]["count"], all_bird_data);

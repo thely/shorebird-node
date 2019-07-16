@@ -1,6 +1,10 @@
+export const B_WIDTH = 600;
+export const B_HEIGHT = 600;
 export const B_ROWS = 94;
 export const B_COLS = 82;
 export const B_MAPSCALE = 15;
 export const B_POPSCALE = 0.1;
 export const B_MAXNODES = 30;
 export const B_DEBUG = true;
+export const B_CHART_ID = "birdChart";
+export const B_CANVAS_ID = "mapZone";

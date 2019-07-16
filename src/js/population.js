@@ -22,6 +22,10 @@ Population.prototype.getVisibleBirds = function() {
 	return this.visibleBirds;
 }
 
+Population.prototype.getColors = function() {
+	return this.colors;
+}
+
 Population.prototype.makeChart = function(birdNames, today, colors) {
 	this.chart = new PopChart(birdNames, today, colors);
 	return this.chart;
@@ -44,6 +48,7 @@ Population.prototype.makeBirds = function(today, habitats, pan) {
 
 		if (today[i] > 0) {
 			let color = __randomColor();
+			colors[i] = color;
 
 			// place # birds of species i
 			let pop = Math.ceil(today[i] * B_POPSCALE);
@@ -67,8 +72,9 @@ Population.prototype.makeBirds = function(today, habitats, pan) {
 		}
 	}
 	console.log("total birds: " + totalBirds);
-	this.makeChart(birdNames, today, colors);
+	// this.makeChart(this.bird_data, today, colors);
 
+	this.colors = colors;
 	this.birds = birds;
 	return birds;
 }

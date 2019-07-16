@@ -14,6 +14,7 @@
   "dependencies": {
     "binauralfir": "^0.1.2",
     "bowser": "^2.4.0",
+    "chart.js": "^2.8.0",
     "p5": "^0.8.0",
     "sample-manager": "^2.1.3",
     "standardized-audio-context": "^20.1.5"
