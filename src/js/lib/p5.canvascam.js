@@ -84,8 +84,8 @@ p5.prototype.CanvasCam = function(zoom, tx, ty) {
 
   // rescale the camera relative to the center
   this.scale = function(factor, centerX, centerY) {
-    relimit();
     var newZoom = zoom * factor;
+    relimit(newZoom);
 
     if (withinLimits(newZoom)) {
       var dx = centerX - dim.x/2;
@@ -110,6 +110,10 @@ p5.prototype.CanvasCam = function(zoom, tx, ty) {
     return {x: tx, y: ty};
   }
 
+  this.getZoom = function() {
+    return zoom;
+  }
+
   this.dimensions = function(view, map) {
     dim.x = view.x;
     dim.y = view.y;
@@ -127,11 +131,14 @@ p5.prototype.CanvasCam = function(zoom, tx, ty) {
     return limit;
   }
 
-  function relimit() {
-    limit.x.min = dim.x / (2 * zoom);
-    limit.y.min = dim.y / (2 * zoom);
+  function relimit(newZoom) {
+    limit.x.min = dim.x / (2 * newZoom);
+    limit.y.min = dim.y / (2 * newZoom);
     limit.x.max = mapOrig.x - limit.x.min;
     limit.y.max = mapOrig.y - limit.y.min;
+
+    console.log("new limit: ");
+    console.log(limit);
   }
 
   function withinLimits(newZoom) {

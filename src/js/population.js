@@ -3,6 +3,7 @@
 
 import p5 from 'p5';
 import Bird from './bird.js';
+import PopChart from './pop-chart.js';
 import { B_POPSCALE } from './settings.js';
 
 function Population(p, dim, bird_data) {
@@ -21,28 +22,36 @@ Population.prototype.getVisibleBirds = function() {
 	return this.visibleBirds;
 }
 
+Population.prototype.makeChart = function(birdNames, today, colors) {
+	this.chart = new PopChart(birdNames, today, colors);
+	return this.chart;
+}
+
 Population.prototype.makeBirds = function(today, habitats, pan) {
-	var birds = [];
-	var center = this.center;
+	let birds = [];
+	let colors = [];
+	let birdNames = [];
+	let center = this.center;
 	let p = this.p;
 
 	this.visibleBirds = [];
-	var totalBirds = 0;
+	let totalBirds = 0;
 
 	// cycle through list of birds/day
-	var bCount = 0;
+	let bCount = 0;
 	for (let i = 0; i < today.length; i++) {
-		if (today[i] > 0) {
-			// one color per species
-			var color = __randomColor();
+		birdNames[i] = this.bird_data[i].name;
 
-			// // place # birds of species i
-			var pop = Math.ceil(today[i] * B_POPSCALE);
+		if (today[i] > 0) {
+			let color = __randomColor();
+
+			// place # birds of species i
+			let pop = Math.ceil(today[i] * B_POPSCALE);
 			// console.log("the pop: "+pop+", i: "+i);
 			totalBirds += pop;
 
-			for (var j = 0; j < pop; j++) {
-				var b = new Bird(p, this.bird_data[i], this.dim, habitats, color);
+			for (let j = 0; j < pop; j++) {
+				let b = new Bird(p, this.bird_data[i], this.dim, habitats, color);
 				b.species = i;
 				b.id = bCount;
 				b.update(this.dim.view, pan);
@@ -58,8 +67,17 @@ Population.prototype.makeBirds = function(today, habitats, pan) {
 		}
 	}
 	console.log("total birds: " + totalBirds);
+	this.makeChart(birdNames, today, colors);
+
 	this.birds = birds;
 	return birds;
+}
+
+Population.prototype.draw = function(zoom) {
+	for (var i = 0; i < this.visibleBirds.length; i++) {
+		this.visibleBirds[i].draw(zoom);
+		
+	}
 }
 
 Population.prototype.update = function(panning) {

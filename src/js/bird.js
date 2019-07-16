@@ -57,11 +57,12 @@ Bird.prototype.update = function(bounds, pan) {
 	}
 }
 
-Bird.prototype.draw = function() {
+Bird.prototype.draw = function(zoom) {
+	let x = 5 / zoom; console.log("size: "+x);
 	this.p.fill(this.color.r, this.color.g, this.color.b);
-	this.p.rect(this.fixedPos.x, this.fixedPos.y, 5, 5);
+	this.p.rect(this.fixedPos.x, this.fixedPos.y, x, x);
 	
-	__nameText.call(this);
+	__nameText.call(this, zoom);
 }
 
 function __positionText() {
@@ -73,13 +74,13 @@ function __positionText() {
 	this.p.pop();
 }
 
-function __nameText() {
+function __nameText(zoom) {
 	this.p.push();
 	this.p.translate(this.fixedPos.x, this.fixedPos.y);
-	this.p.textSize(12);
+	this.p.textSize(12/zoom);
 	// let str = this.id +"\n("+this.fixedPos.x+","+this.fixedPos.y+")\n("+this.pos.x+","+this.pos.y+")";
 	let str = `${this.info.common_name} (${this.info.name})`;
-	this.p.text(str, 10, 0);
+	this.p.text(str, 10/zoom, 10/zoom);
 	this.p.pop();	
 }
 

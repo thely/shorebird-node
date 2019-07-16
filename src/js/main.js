@@ -41,7 +41,6 @@ const sketch = (p) => {
 			dim.tiles.y * B_MAPSCALE
 		);
 
-
 		__defaults(dim);
 		
 		cnv = p.createCanvas(dim.view.x, dim.view.y);
@@ -122,9 +121,11 @@ const sketch = (p) => {
 
 	p.draw = () => {
 		let pan = cam.getPanning();
+		let zoom = cam.getZoom();
 		pan = p.createVector(pan.x, pan.y);
-		popul.update(pan);
 		map.drawFullMap(popul.getVisibleBirds());
+		popul.update(pan);
+		popul.draw(zoom);
 		// audiom.update(popul.getVisibleBirds(), popul.getBirds());
 	}
 
