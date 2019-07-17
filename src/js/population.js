@@ -79,9 +79,9 @@ Population.prototype.makeBirds = function(today, habitats, pan) {
 	return birds;
 }
 
-Population.prototype.draw = function(zoom) {
+Population.prototype.draw = function(zoom, birdSelected) {
 	for (var i = 0; i < this.visibleBirds.length; i++) {
-		this.visibleBirds[i].draw(zoom);
+		this.visibleBirds[i].draw(zoom, birdSelected);
 		
 	}
 }

@@ -6,6 +6,7 @@
   "scripts": {
     "build": "browserify src/js/main.js -o public/bundle.js",
     "watch": "watchify src/js/main.js -o public/bundle.js --debug --verbose -t [ babelify --presets [ @babel/preset-env ] ]",
+    "sass": "node-sass --watch src/sass/style.scss public/style.css",
     "dev": "npm-run-all --parallel start watch",
     "start": "serve public"
   },

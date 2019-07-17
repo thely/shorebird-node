@@ -57,12 +57,18 @@ Bird.prototype.update = function(bounds, pan) {
 	}
 }
 
-Bird.prototype.draw = function(zoom) {
-	let x = 5 / zoom; console.log("size: "+x);
+Bird.prototype.draw = function(zoom, sel) {
+	let x = 5 / zoom;
 	this.p.fill(this.color.r, this.color.g, this.color.b);
-	this.p.rect(this.fixedPos.x, this.fixedPos.y, x, x);
+
+	if (sel && "name" in sel && sel.name == this.name) {
+		this.p.circle(this.fixedPos.x, this.fixedPos.y, x * 2);
+	}
+	else {
+		this.p.rect(this.fixedPos.x, this.fixedPos.y, x, x);
+	}
 	
-	__nameText.call(this, zoom);
+	// __nameText.call(this, zoom);
 }
 
 function __positionText() {

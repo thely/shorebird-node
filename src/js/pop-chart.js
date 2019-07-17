@@ -5,6 +5,7 @@ import { B_CHART_ID, B_POPSCALE } from './settings.js';
 function PopChart() {
 	console.log(B_CHART_ID);
 	let ctx = document.getElementById(B_CHART_ID).getContext('2d');
+	let selected = {};
 
 	this.addData = function(birdData, today, colors) {
 		this.removeData();
@@ -44,6 +45,10 @@ function PopChart() {
 		this.chart.update();
 	}
 
+	this.getSelected = function() {
+		return selected;
+	}
+
 	// function birdNamesOnly(dict, today) {
 	// 	console.log("bird data passed to get bird names: ");
 	// 	console.log(dict);
@@ -65,8 +70,16 @@ function PopChart() {
 	// 	return l;
 	// }
 
+	function dashedBorder(chart, dataset, data, dash) {
+		chart.config.data.datasets[dataset]._meta[0].data[data].draw = function() {
+	        chart.chart.ctx.setLineDash(dash);
+	        Chart.elements.Rectangle.prototype.draw.apply(this, arguments);
+	        chart.chart.ctx.setLineDash([1,0]);
+	    }
+	}
+
 	this.chart = new Chart(ctx, {
-		type: 'bar',
+		type: 'horizontalBar',
 		data: {
 			// labels: birdNamesOnly(birdData),
 			// labels: birdData,
@@ -91,6 +104,27 @@ function PopChart() {
 		options: {
 			responsive: false,
 			maintainAspectRatio: false,
+			onClick: function(event, array) {
+				if (array && array.length > 0) {
+					console.log(array);
+					console.log(event);
+					selected.previous = ('name' in selected) ? { index: selected.index, color: selected.color } : null;
+
+					selected.name = array[0]._model.label;
+					selected.index = array[0]._index;
+					selected.color = array[0]._view.borderColor;
+
+					// data.datasets[0].data[selected.index].borderColor = "rgba(0,0,0,0.5)";
+					// array[0]._view.borderColor = "rgba(0,0,0,0.5)";
+					if (selected.previous) {
+						// data.datasets[0].data[selected.previous.index].borderColor = selected.previous.color;
+
+					}
+				}
+				else {
+					selected = {};
+				}
+			},
 			tooltips: {
 				mode: 'index',
 				intersect: false,
@@ -111,13 +145,21 @@ function PopChart() {
 			// 	intersect: true
 			// },
 			scales: {
-				xAxes: [{
+				yAxes: [{
+					display: false,
 					stacked: true,
 				}],
-				yAxes: [{
+				xAxes: [{
 					ticks: {
 						beginAtZero: true,
-						min: 0
+						min: 0,
+						// callback: function(...args) {
+						//   const value = ChartJS.Ticks.formatters.logarithmic.call(this, ...args);
+						//   if (value.length) {
+						//     return Number(value).toLocaleString()
+						//   }
+						//   return value;
+						// }
 					},
 					type: 'logarithmic',
 					stacked: true

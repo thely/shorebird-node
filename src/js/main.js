@@ -14,7 +14,7 @@ import Bowser from "bowser";
 import { B_WIDTH, B_HEIGHT, B_COLS, B_ROWS, B_MAPSCALE, B_MAXNODES, B_CANVAS_ID } from './settings.js';
 
 var audiom, map, popul, cam, useData, cnv, chart, browser;
-var islandSel, dateSel;
+var islandSel, dateSel, birdSelected;
 var dim = {};
 var soundStarted, mouseOverCanvas;
 
@@ -29,13 +29,10 @@ const sketch = (p) => {
 	}
 
 	p.setup = () => {
+		// Establishing browser + map dimensions
 		browser = Bowser.getParser(window.navigator.userAgent);
 		console.log(`Viewing this in ${browser.getBrowserName()}`);
 		dim.view = p.createVector(B_WIDTH, B_HEIGHT);
-		// dim.map = p.createVector(
-		// 	B_COLS * B_MAPSCALE,
-		// 	B_ROWS * B_MAPSCALE
-		// );
 		dim.tiles = p.createVector( B_COLS, B_ROWS );
 		dim.map = p.createVector(
 			dim.tiles.x * B_MAPSCALE,
@@ -44,15 +41,18 @@ const sketch = (p) => {
 
 		__defaults(dim);
 		
+		// Creating canvas
 		cnv = p.createCanvas(dim.view.x, dim.view.y);
 		cnv.parent(B_CANVAS_ID);
 		cnv.mouseOver(function() { mouseOverCanvas = true; });
 		cnv.mouseOut(function() { mouseOverCanvas = false; });
 		p.background(40);
 
+		// Creating camera
 		cam = new p.CanvasCam(1, p.B_MAPCENTER.x, p.B_MAPCENTER.y);
 		cam.dimensions(dim.view, dim.map);
 
+		// Getting dropdowns for selecting island/date
 		islandSel = p.select(".island-select");
 		islandSel.changed(changeIsland);
 		var parent = p.select(".data-menu");
@@ -60,9 +60,11 @@ const sketch = (p) => {
 		dateSel.changed(changeDate);
 		parent.child(dateSel);
 
+		// Building objects for population, chart, audio
 		popul = new Population(p, dim, all_bird_data);
 		chart = new PopChart();
 		// audiom = new AudioManager(p, B_MAXNODES, browser.getBrowserName());
+		birdSelected = {};
 
 		p.frameRate(30);
 		p.noLoop();
@@ -78,15 +80,6 @@ const sketch = (p) => {
 		else if (islandSel.value() == "hog_data") {
 			useData = hog_data;
 		}
-
-		// reset map and camera stuff
-
-		// __defaults(dim);
-		// console.log(p.B_MAPCENTER);
-		// console.log(dim);
-
-		// cam.dimensions(dim.view, dim.map);
-		// cam.reset(p.B_ZOOM, p.B_MAPCENTER.x, p.B_MAPCENTER.y);
 
 		popul = new Population(p, dim, all_bird_data);
 		map = new ShoreMap(p, dim, useData);
@@ -129,7 +122,7 @@ const sketch = (p) => {
 		pan = p.createVector(pan.x, pan.y);
 		map.drawFullMap(popul.getVisibleBirds());
 		popul.update(pan);
-		popul.draw(zoom);
+		popul.draw(zoom, birdSelected);
 		// audiom.update(popul.getVisibleBirds(), popul.getBirds());
 	}
 
@@ -154,6 +147,11 @@ const sketch = (p) => {
 		p.noLoop();
 	}
 
+	p.mouseClicked = () => {
+		birdSelected = chart.getSelected();
+		p.redraw();
+	}
+
 	p.keyPressed = () => {
 		if (p.key == 'a') {
 			p.B_ZOOM = cam.scale(1.1, p.B_CENTER.x, p.B_CENTER.y);
@@ -169,24 +167,6 @@ const sketch = (p) => {
 		}
 
 		return false;
-	}
-
-	function __frameRates(pan) {
-		p.push();
-		p.textSize(12);
-		p.fill("#FF0000");
-
-		let d = p.createVector(150, 100);
-		let text = 
-		`panning: (${pan.x}, ${pan.y})\n
-		offset: (${p.B_OFFSET.x}, ${p.B_OFFSET.y})\n
-		maxdiff: (${p.B_MAXDIFF.x}, ${p.B_MAXDIFF.y})\n
-		viewsize: (${p.width}, ${p.height})
-		`;
-		text = `panning: (${pan.x}, ${pan.y})\n`;
-		p.textAlign(p.RIGHT);
-		p.text(text, p.width - d.x, p.height - d.y, d.x, d.y);
-		p.pop();
 	}
 
 }
