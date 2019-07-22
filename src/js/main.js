@@ -3,18 +3,21 @@
 import p5 from 'p5';
 import 'p5/lib/addons/p5.dom';
 import './lib/p5.canvascam.js';
+import Bowser from "bowser";
+import wiki from "wikijs";
+
 import AudioManager from './audio.js';
 import ShoreMap from './shoremap.js';
 import Population from './population.js';
 import PopChart from './pop-chart.js';
+
 import cobb_data from './data/cobb-island-data.js';
 import hog_data  from './data/hog-island-data.js';
 import all_bird_data from './data/all_bird_data.js';
-import Bowser from "bowser";
 import { B_WIDTH, B_HEIGHT, B_COLS, B_ROWS, B_MAPSCALE, B_MAXNODES, B_CANVAS_ID } from './settings.js';
 
 var audiom, map, popul, cam, useData, cnv, chart, browser;
-var islandSel, dateSel, birdSelected;
+var islandSel, dateSel, birdSelected, startedOnMap;
 var dim = {};
 var soundStarted, mouseOverCanvas;
 
@@ -131,15 +134,18 @@ const sketch = (p) => {
 			soundStarted = true;
 		}
 		if (mouseOverCanvas){
-			p.loop();	
+			p.loop();
 		}
+
+		startedOnMap = (mouseOverCanvas) ? true : false;
 	}
 
 	p.mouseDragged = () => {
-		let dx = cam.mouseX - cam.pmouseX;
-		let dy = cam.mouseY - cam.pmouseY;
-		cam.translate(-dx, -dy);
-
+		if (startedOnMap) {
+			let dx = cam.mouseX - cam.pmouseX;
+			let dy = cam.mouseY - cam.pmouseY;
+			cam.translate(-dx, -dy);
+		}
 		return false;
 	}
 
@@ -149,7 +155,23 @@ const sketch = (p) => {
 
 	p.mouseClicked = () => {
 		birdSelected = chart.getSelected();
-		p.redraw();
+		if ("name" in birdSelected) {
+			let b = all_bird_data.find(function(e) {
+				return e.name == birdSelected.name;
+			});
+			// console.log(b);
+			wiki().page(b.scientific_name).then(page => {
+				Promise.all([page.summary(), page.mainImage(), page.url()]).then(c => {
+					p.select(".birdName").html(b.common_name + "<span class='science'>("+b.scientific_name+")</span>");
+					p.select(".birdBody").html(c[0]);
+					p.select(".birdImage").attribute("src", c[1]);
+					p.select(".birdLink").attribute("href", c[2]);
+				}, (err) => {
+					console.log(err);
+				})
+			});
+			p.redraw();
+		}
 	}
 
 	p.keyPressed = () => {

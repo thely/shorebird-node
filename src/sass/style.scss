@@ -5,3 +5,19 @@ h1 {
 #mapZone, #birdChart {
 	float: left;
 }
+
+#birdWiki {
+	max-width: 600px;
+
+	.birdContain {
+		float: left;
+		margin-right: 2em;
+		max-width: 200px;
+		width: 200px;
+
+		img {
+			max-width: 200px;
+			width: 200px;
+		}
+	}
+}
