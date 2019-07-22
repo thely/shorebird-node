@@ -8,7 +8,7 @@ function IslandMap(p, dim, data) {
 	this.colorList = __fixColors(data["habitat_pixel_colors"]);
 }
 
-IslandMap.prototype.drawHabitats = function(panning) {
+IslandMap.prototype.draw = function(panning) {
 	var p = this.p;
 
 	if (!panning) {

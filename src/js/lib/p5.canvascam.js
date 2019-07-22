@@ -103,7 +103,7 @@ p5.prototype.CanvasCam = function(zoom, tx, ty) {
   this.translate = function(dx, dy) {
     tx = constrain(tx + dx, limit.x.min, limit.x.max);
     ty = constrain(ty + dy, limit.y.min, limit.y.max);
-    console.log(`(${tx}, ${ty}) - zoom at ${zoom}`);
+    // console.log(`(${tx}, ${ty}) - zoom at ${zoom}`);
   };
 
   this.getPanning = function() {
@@ -137,8 +137,8 @@ p5.prototype.CanvasCam = function(zoom, tx, ty) {
     limit.x.max = mapOrig.x - limit.x.min;
     limit.y.max = mapOrig.y - limit.y.min;
 
-    console.log("new limit: ");
-    console.log(limit);
+    // console.log("new limit: ");
+    // console.log(limit);
   }
 
   function withinLimits(newZoom) {
