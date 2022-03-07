@@ -1,5 +1,5 @@
 // A collection of three nodes: a source node, a binaural FIR panner node,
-// and a gain node.
+// and a gain node. Innocuous edit
 
 import BinauralFIR from 'binauralfir';
 
